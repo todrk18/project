@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.human.dao.ApplicationBoardDAO">
+	<insert id="insert" parameterType="com.human.VO.ApplicationBoardVO">
+		insert into application
+		values(application_num_seq.nextval,#{parcelout},#{img_url},#{area},#{animal_kind},
+		#{gender},#{title},#{content},#{writer},#{phone_number},sysdate,default,#{img_thumb})
+	</insert>
+	<select id="application_seq_num" resultType="int">
+		select application_num_seq.nextval from dual
+	</select>
+
+	<select id="selectall" resultType="com.human.VO.ApplicationBoardVO" parameterType="com.human.VO.PageVO">
+		
+		select * from(select rownum as rcol ,sub.*
+		from (select * from application 
+		<if test="search_word != null">
+			where animal_kind like '%'||#{search_word}||'%' 	<!-- if문을 사용할때는 #이렇게 사용하는데 제약 파라미터 
+				타입이 맵또는 vo가 아니면 if문에서 사용할 수 없다. 그래서 아무 변수명이나 넣으면 자동으로 매핑을 해 준다. 여기서 아무변수는 
+				value 재밌는것은 if문 밖에서는 #{파라미터변수명}이 가능하다. -->
+		</if>
+		order by num desc) sub)
+		where rcol between #{startNo} and #{endNo}  <!-- 서브쿼리-인라인뷰, select 구조, rownum -->
+	</select>
+	
+	<select id="selectOne" resultType="com.human.VO.ApplicationBoardVO"
+		parameterType="int">
+		select * from application where num=#{num_no}  <!-- num은 기본키이다. 결과튜플은 오직 0-1개 -->
+	</select>
+	<update id="cntupdate" parameterType="int">
+		update application set
+		cnt=cnt+1 where num=#{num}
+	</update>
+	<select id="totalCount" resultType="int" parameterType="String">
+		select count(*) from application
+		<if test="value != null">
+			where title like '%'||#{value}||'%' 	
+		</if>
+	</select>
+	<delete id="delApplicationboard" parameterType="int">
+		delete from application
+		where num=#{delno}
+	</delete>
+	<update id="modApplicationboard" parameterType="com.human.VO.ApplicationBoardVO">
+		update application
+		set img_url=#{img_url},
+		area=#{area},
+		animal_kind=#{animal_kind},
+		gender=#{gender},
+		title=#{title},
+		content=#{content},
+		writer=#{writer},
+		phone_number=#{phone_number},
+		img_thumb=#{img_thumb}
+		where num=#{num}
+	</update>
+
+</mapper>

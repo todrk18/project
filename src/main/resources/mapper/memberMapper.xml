@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="memberMapper">
+	<!-- 회원가입 -->
+	<insert id="register">
+	    insert into member(      userid
+	   					       , pass
+	   					       , name 
+	   					       , gender
+	   					       , phone_number
+	   					       , adress
+	   					       , email)
+	                  VALUES(    #{userid,jdbcType=VARCHAR} 
+	                 		   , #{pass}
+	                 		   , #{name}
+	                 		   , #{gender}
+	                 		   , #{phone_number}
+	                 		   , #{adress}
+	                 		   , #{email})
+    </insert>
+    
+    <!-- 아이디 중복체크 -->
+    <select id="idCheck"  resultType="com.human.VO.MemberVO">
+ 	select userid from member
+    where userid = #{userid,jdbcType=VARCHAR}
+	</select>
+    
+    <!-- 로그인 -->
+    <select id="login" resultType="com.human.VO.MemberVO">
+    	select userid,pass from member where userid = #{userid} and pass = #{pass}
+    </select>
+    
+    <!-- 회원정보 수정 -->
+    <update id="modify">
+    	update member set pass = #{pass} where userid = #{userid}
+    </update>
+    
+    <!-- 회원탈퇴 -->
+    <delete id="withdrawal">
+    	delete from member where userid = #{userid} and pass = #{pass}
+    </delete>
+    
+
+</mapper>

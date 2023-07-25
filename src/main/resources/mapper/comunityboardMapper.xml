@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.human.dao.ComunityBoardDAO">
+	<insert id="insert" parameterType="com.human.VO.ComunityBoardVO">
+		insert into comunity
+		values(comunity_num_seq.nextval,#{img_url},#{animal_kind},#{title},#{content},#{writer},sysdate,default,#{img_thumb})
+	</insert>
+	<select id="comunity_seq_num" resultType="int">
+		select comunity_num_seq.nextval from dual
+	</select>
+
+	<select id="selectall" resultType="com.human.VO.ComunityBoardVO" parameterType="com.human.VO.PageVO">
+		
+		select * from(select rownum as rcol ,sub.*
+		from (select * from comunity 
+		<if test="search_word != null">
+			where title like '%'||#{search_word}||'%' 	<!-- if문을 사용할때는 #이렇게 사용하는데 제약 파라미터 
+				타입이 맵또는 vo가 아니면 if문에서 사용할 수 없다. 그래서 아무 변수명이나 넣으면 자동으로 매핑을 해 준다. 여기서 아무변수는 
+				value 재밌는것은 if문 밖에서는 #{파라미터변수명}이 가능하다. -->
+		</if>
+		order by num desc) sub)
+		where rcol between #{startNo} and #{endNo}  <!-- 서브쿼리-인라인뷰, select 구조, rownum -->
+	</select>
+	
+	<select id="selectOne" resultType="com.human.VO.ComunityBoardVO"
+		parameterType="int">
+		select * from comunity where num=#{num_no}  <!-- num은 기본키이다. 결과튜플은 오직 0-1개 -->
+	</select>
+	<update id="cntupdate" parameterType="int">
+		update comunity set
+		cnt=cnt+1 where num=#{num}
+	</update>
+	<select id="totalCount" resultType="int" parameterType="String">
+		select count(*) from comunity
+		<if test="value != null">
+			where title like '%'||#{value}||'%' 	
+		</if>
+	</select>
+	<delete id="delComunityboard" parameterType="int">
+		delete from comunity
+		where num=#{delno}
+	</delete>
+	<update id="modComunityboard" parameterType="com.human.VO.ComunityBoardVO">
+		update comunity
+		set img_url=#{img_url},
+		animal_kind=#{animal_kind},
+		title=#{title},
+		content=#{content},
+		writer=#{writer},
+		img_thumb=#{img_thumb}
+		where num=#{num}
+	</update>
+
+</mapper>
